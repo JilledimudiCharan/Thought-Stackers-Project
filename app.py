@@ -1,23 +1,3 @@
-"""
-WEBSITE GROWTH ANALYZER - Python Backend
-
-PURPOSE:
-This Flask backend receives website URLs from the frontend,
-fetches the actual websites, analyzes their HTML content,
-calculates scores, and returns real recommendations.
-
-HOW IT WORKS:
-1. Receives POST request with URL + business goal
-2. Fetches the website using Requests library
-3. Parses HTML using BeautifulSoup4
-4. Checks for: H1 tags, meta description, CTAs, SSL, favicon, viewport, Open Graph
-5. Calculates UX/SEO/Performance/Content scores
-6. Generates custom recommendations based on business goal type
-7. Returns JSON to frontend
-
-NO FAKE DATA - Every analysis is based on the actual website fetched!
-"""
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
@@ -26,54 +6,42 @@ from urllib.parse import urlparse
 import time
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend requests
+CORS(app)
 
 def analyze_website(url):
-    """Analyze a website and return real data"""
     try:
-        # Add http if not present
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        # Fetch the website
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         start_time = time.time()
         response = requests.get(url, headers=headers, timeout=10)
         load_time = time.time() - start_time
         
-        # Parse HTML
         soup = BeautifulSoup(response.content, 'html.parser')
         
-        # Extract data
         title = soup.find('title')
         title_text = title.string if title else 'No title'
         
-        # Find headings
         h1_tags = soup.find_all('h1')
         h2_tags = soup.find_all('h2')
         
-        # Find meta description
         meta_desc = soup.find('meta', attrs={'name': 'description'})
         has_meta_desc = meta_desc is not None
         
-        # Check for favicon
         favicon = soup.find('link', rel='icon') or soup.find('link', rel='shortcut icon') or soup.find('link', rel='apple-touch-icon')
         has_favicon = favicon is not None
         
-        # Check for mobile viewport
         viewport = soup.find('meta', attrs={'name': 'viewport'})
         has_viewport = viewport is not None
         
-        # Check for Open Graph tags
         og_title = soup.find('meta', property='og:title')
         og_desc = soup.find('meta', property='og:description')
         og_image = soup.find('meta', property='og:image')
         has_og_tags = og_title is not None or og_desc is not None or og_image is not None
         
-        # Check SSL/HTTPS
         is_https = url.startswith('https://')
         
-        # Find CTAs (buttons, links with certain text)
         cta_keywords = ['buy', 'shop', 'get started', 'sign up', 'contact', 'learn more', 'free trial']
         buttons = soup.find_all('button')
         links = soup.find_all('a')
@@ -89,7 +57,6 @@ def analyze_website(url):
             if any(keyword in text for keyword in cta_keywords):
                 ctas_found.append(text)
         
-        # Check for images
         images = soup.find_all('img')
         large_images = 0
         for img in images:
@@ -97,8 +64,7 @@ def analyze_website(url):
             if src and not src.endswith(('.svg', '.ico')):
                 large_images += 1
         
-        # Calculate scores
-        ux_score = 15  # Base score
+        ux_score = 15 
         if len(ctas_found) > 0:
             ux_score += 5
         if len(h1_tags) == 1:
@@ -106,7 +72,7 @@ def analyze_website(url):
         if len(h1_tags) > 1:
             ux_score -= 2
             
-        seo_score = 10  # Base score  
+        seo_score = 10   
         if has_meta_desc:
             seo_score += 5
         if len(h1_tags) >= 1:
@@ -120,7 +86,7 @@ def analyze_website(url):
         if has_og_tags:
             seo_score += 1
             
-        perf_score = 20  # Base score
+        perf_score = 20  
         if load_time < 2:
             perf_score += 5
         elif load_time > 5:
@@ -128,7 +94,7 @@ def analyze_website(url):
         if large_images > 20:
             perf_score -= 5
             
-        content_score = 15  # Base score
+        content_score = 15  
         if len(soup.get_text()) > 1000:
             content_score += 5
         if title_text != 'No title':
@@ -136,7 +102,6 @@ def analyze_website(url):
             
         overall_score = ux_score + seo_score + perf_score + content_score
         
-        # Generate issues based on analysis
         issues = []
         
         if len(ctas_found) == 0:
@@ -173,7 +138,6 @@ def analyze_website(url):
                 "impact": "Diluted SEO value - use only one H1 per page"
             })
         
-        # Ensure at least 3 issues
         if len(issues) < 3:
             issues.append({
                 "problem": "Generic homepage message",
@@ -181,7 +145,6 @@ def analyze_website(url):
                 "impact": "Visitors may not understand what you offer - make your headline more specific"
             })
         
-        # Quick wins
         quick_wins = [
             {
                 "fix": "Add prominent CTA button above fold" if len(ctas_found) == 0 else "Make existing CTAs more prominent",
@@ -200,7 +163,6 @@ def analyze_website(url):
             }
         ]
         
-        # SEO recommendations
         seo_recommendations = []
         if not has_meta_desc:
             seo_recommendations.append({
@@ -221,7 +183,6 @@ def analyze_website(url):
                 "suggestion": "Add H2 headings to break content into scannable sections"
             })
         
-        # Trust signals
         trust_signals = [
             {
                 "status": "✅" if is_https else "❌",
@@ -265,7 +226,6 @@ def analyze_website(url):
             }
         ]
         
-        # Growth suggestions
         growth_suggestions = [
             {
                 "title": "Implement exit-intent popup",
@@ -302,7 +262,6 @@ def analyze_website(url):
         }
     
     except Exception as e:
-        # Return error with generic data
         return {
             "error": str(e),
             "overallScore": 50,
@@ -335,7 +294,6 @@ def analyze():
     
     result = analyze_website(url)
     
-    # Tailor growth suggestions based on goal
     goal_tips = {
         'business': [
             {"title": "Add lead capture form", "description": "Place contact/quote form above the fold. Capture 15-25% more leads."},

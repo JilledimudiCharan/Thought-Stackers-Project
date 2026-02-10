@@ -1,23 +1,4 @@
-/*
- * WEBSITE GROWTH ANALYZER - Frontend JavaScript
- * 
- * HOW IT WORKS:
- * 1. User selects business goal (Business/Portfolio/Blog/E-commerce)
- * 2. User enters website URL
- * 3. JavaScript sends URL + goal to Python backend API (http://localhost:5000/analyze)
- * 4. Backend fetches the actual website, analyzes it, calculates scores
- * 5. Backend returns JSON with real analysis data
- * 6. This script displays the results in 6 unique tab designs
- * 
- * NO FAKE DATA - Everything comes from real website analysis!
- */
-
-// ========================================
-// STATE MANAGEMENT
-// ========================================
-let selectedGoal = null;  // Tracks which business type user selected
-
-// Goal-specific customizations for business types
+let selectedGoal = null;  
 const goalCustomizations = {
     business: {
         healthExplanation: "Your service website has a clean foundation, but it's not set up to generate leads consistently. Business buyers need immediate clarity on three things: what you do, how you're different, and why they should contact you today. Right now, these aren't obvious enough, which means you're losing potential clients to competitors who communicate more directly.",
@@ -89,7 +70,6 @@ const goalCustomizations = {
     }
 };
 
-// DOM Elements
 const goalButtons = document.querySelectorAll('.goal-btn');
 const urlInputSection = document.getElementById('urlInputSection');
 const analyzeBtn = document.getElementById('analyzeBtn');
@@ -99,14 +79,12 @@ const resultsSection = document.getElementById('results');
 const loading = document.getElementById('loading');
 const resultsContent = document.getElementById('resultsContent');
 
-// Goal selection handler
 goalButtons.forEach(button => {
     button.addEventListener('click', () => {
         goalButtons.forEach(btn => btn.classList.remove('selected'));
         button.classList.add('selected');
         selectedGoal = button.getAttribute('data-goal');
 
-        // Clear previous URL, errors, and results when switching domains
         websiteUrlInput.value = '';
         errorMsg.textContent = '';
         errorMsg.style = '';
@@ -118,16 +96,13 @@ goalButtons.forEach(button => {
     });
 });
 
-// Tab switching functionality
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 
 function switchTab(tabName) {
-    // Remove active class from all tabs and content
     tabButtons.forEach(btn => btn.classList.remove('active'));
     tabContents.forEach(content => content.classList.remove('active'));
 
-    // Add active class to clicked tab and corresponding content
     const clickedTab = document.querySelector(`[data-tab="${tabName}"]`);
     const targetContent = document.getElementById(`tab-${tabName}`);
 
@@ -137,7 +112,6 @@ function switchTab(tabName) {
     }
 }
 
-// Add click listeners to tab buttons
 tabButtons.forEach(button => {
     button.addEventListener('click', () => {
         const tabName = button.getAttribute('data-tab');
@@ -145,21 +119,16 @@ tabButtons.forEach(button => {
     });
 });
 
-// URL validation
 function isValidURL(url) {
     const urlPattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/;
     return urlPattern.test(url);
 }
 
-// Display comprehensive analysis results
 function displayProfessionalAnalysis(data) {
-    // Get goal-specific customizations if available
     const customization = selectedGoal ? goalCustomizations[selectedGoal] : null;
 
-    // TAB 1: Overall Website Health
     document.getElementById('overallScore').textContent = data.overallScore;
 
-    // Update circular progress indicators
     updateCircularProgress('uxCirclePath', 'uxScore', data.scores.ux, 25);
     updateCircularProgress('seoCirclePath', 'seoScore', data.scores.seo, 25);
     updateCircularProgress('perfCirclePath', 'perfScore', data.scores.performance, 25);
@@ -168,7 +137,6 @@ function displayProfessionalAnalysis(data) {
     const healthExplanation = customization?.healthExplanation || data.healthExplanation;
     document.getElementById('healthExplanation').textContent = healthExplanation;
 
-    // TAB 2: Top Issues (Why Visitors Are Leaving)
     const leavingReasonsContainer = document.getElementById('leavingReasons');
     leavingReasonsContainer.innerHTML = '';
     data.leavingReasons.forEach(reason => {
@@ -182,7 +150,6 @@ function displayProfessionalAnalysis(data) {
         leavingReasonsContainer.appendChild(reasonDiv);
     });
 
-    // TAB 3: Quick Wins
     const quickWinsContainer = document.getElementById('quickWinsList');
     quickWinsContainer.innerHTML = '';
     data.quickWins.forEach(win => {
@@ -196,7 +163,6 @@ function displayProfessionalAnalysis(data) {
         quickWinsContainer.appendChild(winDiv);
     });
 
-    // TAB 4: SEO & Content
     const seoContainer = document.getElementById('seoContent');
     seoContainer.innerHTML = '';
     data.seoContent.forEach(item => {
@@ -210,7 +176,6 @@ function displayProfessionalAnalysis(data) {
         seoContainer.appendChild(itemDiv);
     });
 
-    // TAB 5: Trust & Credibility
     const trustContainer = document.getElementById('trustAnalysis');
     trustContainer.innerHTML = `
         <div class="trust-overview">${data.trustAnalysis.overview}</div>
@@ -234,7 +199,6 @@ function displayProfessionalAnalysis(data) {
         trustGrid.appendChild(signalDiv);
     });
 
-    // TAB 6: Business Growth Suggestions
     const growthSuggestions = customization?.growthSuggestions || data.growthSuggestions;
     const growthContainer = document.getElementById('growthSuggestions');
     growthContainer.innerHTML = '';
@@ -249,25 +213,21 @@ function displayProfessionalAnalysis(data) {
     });
 }
 
-// Animate circular progress
 function updateCircularProgress(pathId, scoreId, value, maxValue) {
     const percentage = (value / maxValue) * 100;
     const circle = document.getElementById(pathId);
     const scoreText = document.getElementById(scoreId);
 
-    // Circle calculations
     const radius = 40;
-    const circumference = 2 * Math.PI * radius; // 251.2
+    const circumference = 2 * Math.PI * radius; 
     const offset = circumference - (percentage / 100) * circumference;
 
-    // Animate circle
     setTimeout(() => {
         circle.style.strokeDashoffset = offset;
     }, 100);
 
-    // Animate number
     let currentValue = 0;
-    const increment = value / 50; // 50 frames
+    const increment = value / 50; 
     const timer = setInterval(() => {
         currentValue += increment;
         if (currentValue >= value) {
@@ -278,7 +238,6 @@ function updateCircularProgress(pathId, scoreId, value, maxValue) {
     }, 30);
 }
 
-// Analyze website function
 function analyzeWebsite() {
     const url = websiteUrlInput.value.trim();
 
@@ -302,7 +261,6 @@ function analyzeWebsite() {
 
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // Call real backend API
     fetch('http://localhost:5000/analyze', {
         method: 'POST',
         headers: {
@@ -314,7 +272,6 @@ function analyzeWebsite() {
         .then(data => {
             loading.classList.add('hidden');
 
-            // Check if there was an error in analysis
             if (data.error) {
                 resultsSection.classList.add('hidden');
                 errorMsg.textContent = `❌ Could not analyze website: ${data.error}. Please check the URL and try again.`;
@@ -330,7 +287,6 @@ function analyzeWebsite() {
 
             resultsContent.classList.remove('hidden');
 
-            // Display real analysis data
             displayProfessionalAnalysis(data);
 
             analyzeBtn.disabled = false;
@@ -351,7 +307,6 @@ function analyzeWebsite() {
         });
 }
 
-// Event listeners
 analyzeBtn.addEventListener('click', analyzeWebsite);
 
 websiteUrlInput.addEventListener('keypress', (e) => {
