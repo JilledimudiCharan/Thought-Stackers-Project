@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<!--
+    WEBSITE GROWTH ANALYZER - Frontend HTML
+    
+    STRUCTURE:
+    - Head: Meta tags, favicon, CSS/JS links, Font Awesome icons
+    - Body: 
+        1. Goal selection buttons (Business/Portfolio/Blog/E-commerce)
+        2. URL input section
+        3. Loading animation
+        4. Results section with 6 tabs (each has unique design in style.css)
+        5. Footer
+    
+    JAVASCRIPT INTEGRATION:
+    - script.js handles all interactivity
+    - Sends URL to backend API (localhost:5000/analyze)
+    - Displays real analysis results in tabs
+-->
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Growth Analyzer</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <section id="home" class="section">
+        <div class="container">
+            <h1 class="main-title">Website Growth Analyzer</h1>
+            <p class="description">
+                Professional website analysis that explains WHY your website fails or succeeds at converting visitors
+                into customers.
+            </p>
+
+            <div class="goal-selection">
+                <h3 class="goal-title">What is the main purpose of your website?</h3>
+                <div class="goal-options">
+                    <button class="goal-btn" data-goal="business">
+                        <span class="goal-icon">💼</span>
+                        <span class="goal-text">Business / Service</span>
+                    </button>
+                    <button class="goal-btn" data-goal="portfolio">
+                        <span class="goal-icon">🎨</span>
+                        <span class="goal-text">Portfolio</span>
+                    </button>
+                    <button class="goal-btn" data-goal="blog">
+                        <span class="goal-icon">📝</span>
+                        <span class="goal-text">Blog</span>
+                    </button>
+                    <button class="goal-btn" data-goal="ecommerce">
+                        <span class="goal-icon">🛒</span>
+                        <span class="goal-text">E-commerce</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="urlInputSection" class="input-container hidden">
+                <input type="text" id="websiteUrl" placeholder="Enter website URL (e.g., https://example.com)"
+                    class="url-input">
+                <button id="analyzeBtn" class="analyze-btn">Analyze Website</button>
+                <p class="note">Analysis may take a few seconds.</p>
+                <p id="errorMsg" class="error-msg"></p>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="section bg-light">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Select your business type</h3>
+                        <p>Choose the category that best matches your website's purpose</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Enter website URL</h3>
+                        <p>Provide the URL of the website you want to analyze</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Receive professional analysis</h3>
+                        <p>Get detailed insights from four key perspectives: UX, SEO, Performance, and Content</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Implement recommendations</h3>
+                        <p>Follow actionable suggestions to improve conversion rates</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results" class="section hidden">
+        <div class="container">
+            <h2 class="section-title">Website Analysis Results</h2>
+
+            <div id="loading" class="loading hidden">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                </div>
+                <p class="loading-text">Analyzing your website...</p>
+            </div>
+
+            <div id="resultsContent" class="results-content hidden">
+
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="overall"><i class="fas fa-chart-line"></i> Overall
+                        Health</button>
+                    <button class="tab-btn" data-tab="issues"><i class="fas fa-exclamation-triangle"></i> Top
+                        Issues</button>
+                    <button class="tab-btn" data-tab="quickwins"><i class="fas fa-bolt"></i> Quick Wins</button>
+                    <button class="tab-btn" data-tab="seo"><i class="fas fa-search"></i> SEO & Content</button>
+                    <button class="tab-btn" data-tab="trust"><i class="fas fa-shield-alt"></i> Trust Signals</button>
+                    <button class="tab-btn" data-tab="growth"><i class="fas fa-rocket"></i> Growth Tips</button>
+                </div>
+
+                <div class="tab-content-container">
+
+                    <div class="tab-content active" id="tab-overall">
+                        <div class="health-score-container">
+                            <div class="main-score">
+                                <div class="score-circle-large">
+                                    <span id="overallScore" class="score-number-large">0</span>
+                                    <span class="score-total-large">/100</span>
+                                </div>
+                            </div>
+
+                            <div class="score-breakdown">
+                                <div class="score-circle-item">
+                                    <div class="circular-progress" data-score="0" id="uxCircle">
+                                        <svg width="100" height="100">
+                                            <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                                            <circle cx="50" cy="50" r="40" class="circle-progress" id="uxCirclePath">
+                                            </circle>
+                                        </svg>
+                                        <div class="circle-text">
+                                            <span id="uxScore" class="circle-score">0</span>
+                                            <span class="circle-label">UX</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="score-circle-item">
+                                    <div class="circular-progress" data-score="0" id="seoCircle">
+                                        <svg width="100" height="100">
+                                            <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                                            <circle cx="50" cy="50" r="40" class="circle-progress" id="seoCirclePath">
+                                            </circle>
+                                        </svg>
+                                        <div class="circle-text">
+                                            <span id="seoScore" class="circle-score">0</span>
+                                            <span class="circle-label">SEO</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="score-circle-item">
+                                    <div class="circular-progress" data-score="0" id="perfCircle">
+                                        <svg width="100" height="100">
+                                            <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                                            <circle cx="50" cy="50" r="40" class="circle-progress" id="perfCirclePath">
+                                            </circle>
+                                        </svg>
+                                        <div class="circle-text">
+                                            <span id="perfScore" class="circle-score">0</span>
+                                            <span class="circle-label">Speed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="score-circle-item">
+                                    <div class="circular-progress" data-score="0" id="contentCircle">
+                                        <svg width="100" height="100">
+                                            <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                                            <circle cx="50" cy="50" r="40" class="circle-progress"
+                                                id="contentCirclePath"></circle>
+                                        </svg>
+                                        <div class="circle-text">
+                                            <span id="contentScore" class="circle-score">0</span>
+                                            <span class="circle-label">Content</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="healthExplanation" class="section-explanation"></p>
+                    </div>
+
+                    <div class="tab-content" id="tab-issues">
+                        <h3 class="tab-heading">Why Visitors Leave</h3>
+                        <div id="leavingReasons" class="leaving-reasons-list"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-quickwins">
+                        <h3 class="tab-heading">Quick Wins (24-48 Hours)</h3>
+                        <p class="tab-intro">Simple fixes you can implement immediately:</p>
+                        <div id="quickWinsList" class="quick-wins-list"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-seo">
+                        <h3 class="tab-heading">SEO & Content Improvements</h3>
+                        <div id="seoContent" class="seo-content-sections"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-trust">
+                        <h3 class="tab-heading">Trust & Credibility</h3>
+                        <div id="trustAnalysis" class="trust-sections"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-growth">
+                        <h3 class="tab-heading">Growth Strategies</h3>
+                        <p class="tab-intro">Tailored recommendations for your business type:</p>
+                        <div id="growthSuggestions" class="growth-list"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <h3>Website Growth Analyzer</h3>
+            <p>Thought Stackers | SMVEC</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

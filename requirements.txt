@@ -1,0 +1,14 @@
+# WEBSITE GROWTH ANALYZER - Python Dependencies
+# 
+# Install with: pip install -r requirements.txt
+#
+# Dependencies:
+# - Flask: Web framework for API endpoints
+# - Flask-CORS: Allows frontend (port 8000) to call backend (port 5000)
+# - Requests: Fetches actual websites from the internet
+# - BeautifulSoup4: Parses HTML to analyze website structure
+
+flask==3.0.0
+flask-cors==4.0.0
+requests==2.31.0
+beautifulsoup4==4.12.2
