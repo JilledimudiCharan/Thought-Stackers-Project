@@ -8,6 +8,11 @@ import time
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/")
+def home():
+    return "Website Growth Analyzer backend is running successfully!"
+
+
 def analyze_website(url):
     try:
         if not url.startswith(('http://', 'https://')):
